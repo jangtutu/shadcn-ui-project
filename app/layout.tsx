@@ -4,6 +4,7 @@ import { Roboto } from "next/font/google"; //구글폰트 추가
 //전역 css
 import "@/styles/globals.css";
 import SideNavigation from "@/components/common/navigation/SideNavigation";
+import { Toaster } from "@/components/ui/toaster"
 
 const roboto = Roboto({ subsets: ["latin"],weight:["400","500","700"]})
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       >
         <SideNavigation/> 
         {children}
+        <Toaster/>
       </body>
     </html>
   );
