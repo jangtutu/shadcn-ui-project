@@ -17,7 +17,7 @@ function page() {
           <div className={styles.progressBar}>
             <span className={styles.progressBar__status}>0/10 completed</span>
             {/*프로그래스 바 UI*/}
-            <Progress value={33} className="w-[30%] h-2" indicatorColor="bg-green-500"/>
+            <Progress value={33} className="w-[30%] h-2" indicatorColor="bg-green-400"/>
           </div>
           <div className={styles.calenderBox}>
             <div className={styles.calenderBox__calender}>

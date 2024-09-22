@@ -31,5 +31,10 @@
             font-weight: 500;
             color: #a6a6a6;
         }
+        &__list {
+            display: flex;
+            flex-direction: column;
+            gap:8px;
+        }
     }
 }

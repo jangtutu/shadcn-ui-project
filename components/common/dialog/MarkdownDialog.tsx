@@ -23,6 +23,7 @@ import { useState } from "react";
 
 
 function MarkdownDialog() {
+    const [open, setOpen] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
     const [content,setContent] = useState<string | undefined>("**Hello, World!!**");
     const { toast } = useToast()
@@ -56,11 +57,14 @@ function MarkdownDialog() {
                     title: "생성 완료!",
                     description: "올바르게 저장되었습니다.",
                 });
+
+                //등록 후 조건 초기화
+                setOpen(false);
             }
         }
     };
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {/*<Button variant={"ghost"} className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Add Contents</Button>*/}
                 <span className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Add Contents</span>
