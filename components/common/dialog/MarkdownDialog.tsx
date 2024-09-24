@@ -2,6 +2,7 @@
 
 import MDEditor from "@uiw/react-md-editor";
 import { supabase } from "@/utils/supabase";
+import { usePathname } from "next/navigation";
 //Shadcn UI
 import {
     Dialog,
@@ -21,45 +22,86 @@ import { useToast } from "@/hooks/use-toast"
 import styles from "./MarkdownDialog.module.scss";
 import { useState } from "react";
 
+interface Todo {
+    id: number;
+    title: string;
+    start_date: string | Date;
+    end_date: string | Date;
+    contents: BoardContent[];
+  }
 
+  interface BoardContent {
+    boardId: string | number;
+    isCompleted: boolean;
+    title: string;
+    startDate: string | Date;
+    endDate: string | Date;
+    content: string;
+  }
+  
 function MarkdownDialog() {
+    const pathname = usePathname();
     const [open, setOpen] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
+    const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+    const [endDate, setEndDate] = useState<Date | undefined>(new Date());
     const [content,setContent] = useState<string | undefined>("**Hello, World!!**");
     const { toast } = useToast()
 
     const onSubmit = async () => {
         console.log("함수호출");
-        if(!title||!content) {
+        if(!title || !startDate || !endDate || !content) {
             toast({
                 title: "기입되지않은 데이터가 있습니다",
                 description: "제목,날짜 혹은 콘텐츠 값을 모두 작성해주세요",
               });
               return;
         } else {
-            //Supabase 데이터베이스에 연동
+            //해당 Board에 대한 데이터만 수정이 되도록 한다.
+            let {data : todos} = await supabase.from("todos").select("*");
+
+            if(todos !== null) {
+                todos.forEach(async(item: Todo)=> {
+                    if(item.id == Number(pathname.split("/")[2])) {
+                        item.contents.forEach((element:BoardContent)=> {
+                            if(element.boardId == "g52mTj-yFrfZQ_WpVi38J") {
+                                element.title = title;
+                                element.content = content;
+                                element.startDate = startDate;
+                                element.endDate = endDate;
+                            } else {
+                                element.title = element.title;
+                                element.content = element.content;
+                                element.startDate = element.startDate;
+                                element.endDate = element.endDate;
+                            }
+                        });
+                                    //Supabase 데이터베이스에 연동
             const { data, error, status } = await supabase
-                .from('todos')
-                .insert([
-                    { title: title, content: content },
-                ])
-                .select()
+            .from('todos')
+            .update({contents: item.contents})
+            .eq("id", pathname.split("/")[2])
 
-                if(error) {
-                    console.log(error);
-                    toast({
-                        title: "에러가 발생했습니다",
-                        description: "창에 출력된 에러를 확인해주세요",
-                    });
-                }
-            if(status == 201) {
+            if(error) {
+                console.log(error);
                 toast({
-                    title: "생성 완료!",
-                    description: "올바르게 저장되었습니다.",
+                    title: "에러가 발생했습니다",
+                    description: "창에 출력된 에러를 확인해주세요",
                 });
+            }
+        if(status == 204) {
+            toast({
+                title: "수정 완료!",
+                description: "올바르게 저장되었습니다.",
+            });
 
-                //등록 후 조건 초기화
-                setOpen(false);
+            //등록 후 조건 초기화
+            setOpen(false);
+        }
+                    }
+                });
+            } else {
+                return;
             }
         }
     };
